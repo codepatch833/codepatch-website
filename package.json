@@ -1,7 +1,6 @@
 {
-  "name": "codepatch-portfolio",
-  "private": true,
-  "version": "0.1.0",
+  "name": "codepatch-website",
+  "version": "1.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
