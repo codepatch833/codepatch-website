@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
-import { ArrowUpRight, ChevronDown, Code2, ExternalLink, GitBranch, Globe2, Menu, Moon, Play, Sun, Video, X } from 'lucide-react'
+import { ArrowUpRight, ChevronDown, Code2, ExternalLink, GitBranch, Menu, Moon, Play, Sun, Video, X } from 'lucide-react'
 import codepatchLogo from '../assets/codepatch logo.png'
 import pathToFactLogo from '../assets/PathToFact Logo.png'
+import layer0Icon from '../assets/projects icons/layer0.png'
+import formulaXIcon from '../assets/projects icons/formula x.png'
+import wareveIcon from '../assets/projects icons/wareve.png'
+import lumberJackIcon from '../assets/projects icons/lumber jack.png'
+import f1ManagerS2Icon from '../assets/projects icons/f1 manager s2.png'
+import f1ManagerClassicIcon from '../assets/projects icons/f1 manager classic.png'
 
 type Page = 'home' | 'projects' | 'about' | 'path'
 type Category = 'All' | 'Games' | 'Software' | 'Experiments' | 'Tools'
@@ -26,13 +32,15 @@ function writeCache<T>(key: string, data: T) {
 }
 
 const projects = [
-  { title: 'Layer 0: Find the Impostor', category: 'Games', year: '2025', description: 'An investigation game in UN cyberspace. Complete tasks, observe and vote across three rounds.', tags: ['Unity', 'Strategy'], tone: 'blue', icon: '01', link: 'https://codepatch.itch.io/layer-0' },
-  { title: 'Formula X - F1 Manager', category: 'Games', year: '2025', description: 'An F1 management game that takes the series into the future.', tags: ['Unity', 'Simulation'], tone: 'violet', icon: '02', link: 'https://codepatch.itch.io/formula-x' },
-  { title: 'WarEve - Domains\' Return', category: 'Games', year: '2025', description: 'A game about going back through history, built around war and simulation.', tags: ['Unity', 'Simulation'], tone: 'coral', icon: '03', link: 'https://codepatch.itch.io/wareve-domains-return' },
-  { title: 'Lumber Jack', category: 'Games', year: '2024', description: 'Become a fast lumber jack in this focused arcade simulation.', tags: ['Unity', 'Arcade'], tone: 'lime', icon: '04', link: 'https://codepatch.itch.io/lumber-jack' },
-  { title: 'F1 Manager S2', category: 'Games', year: '2023', description: 'The second chapter of the F1 Manager series.', tags: ['Scratch', 'Racing'], tone: 'blue', icon: '05', link: 'https://codepatch.itch.io/f1-manager-s2' },
-  { title: 'F1 Manager Classic', category: 'Games', year: '2022', description: 'The first chapter of the F1 Manager series.', tags: ['Scratch', 'Racing'], tone: 'violet', icon: '06', link: 'https://codepatch.itch.io/f1-manager-classic' },
+  { title: 'Layer 0: Find the Impostor', category: 'Games', year: '2025', description: 'An investigation game in UN cyberspace. Complete tasks, observe and vote across three rounds.', tags: ['Unity', 'Strategy'], tone: 'blue', icon: '01', image: layer0Icon, link: 'https://codepatch.itch.io/layer-0' },
+  { title: 'Formula X - F1 Manager', category: 'Games', year: '2025', description: 'An F1 management game that takes the series into the future.', tags: ['Unity', 'Simulation'], tone: 'violet', icon: '02', image: formulaXIcon, link: 'https://codepatch.itch.io/formula-x' },
+  { title: 'WarEve - Domains\' Return', category: 'Games', year: '2025', description: 'A game about going back through history, built around war and simulation.', tags: ['Unity', 'Simulation'], tone: 'coral', icon: '03', image: wareveIcon, link: 'https://codepatch.itch.io/wareve-domains-return' },
+  { title: 'Lumber Jack', category: 'Games', year: '2024', description: 'Become a fast lumber jack in this focused arcade simulation.', tags: ['Unity', 'Arcade'], tone: 'lime', icon: '04', image: lumberJackIcon, link: 'https://codepatch.itch.io/lumber-jack' },
+  { title: 'F1 Manager S2', category: 'Games', year: '2023', description: 'The second chapter of the F1 Manager series.', tags: ['Scratch', 'Racing'], tone: 'blue', icon: '05', image: f1ManagerS2Icon, link: 'https://codepatch.itch.io/f1-manager-s2' },
+  { title: 'F1 Manager Classic', category: 'Games', year: '2022', description: 'The first chapter of the F1 Manager series.', tags: ['Scratch', 'Racing'], tone: 'violet', icon: '06', image: f1ManagerClassicIcon, link: 'https://codepatch.itch.io/f1-manager-classic' },
 ]
+
+const recentProjects = [...projects].sort((first, second) => Number(second.year) - Number(first.year)).slice(0, 3)
 
 const itchEngineBySlug: Record<string, string> = { 'layer-0': 'Unity', 'formula-x': 'Unity', 'wareve-domains-return': 'Unity', 'lumber-jack': 'Unity', 'f1-manager-s2': 'Scratch', 'f1-manager-classic': 'Scratch' }
 
@@ -44,18 +52,12 @@ const copy = {
 function App() {
   const [page, setPage] = useState<Page>('home')
   const [category, setCategory] = useState<Category>('All')
-  const [language, setLanguage] = useState<Language>(() => {
-    const savedLanguage = localStorage.getItem('codepatch-language')
-    if (savedLanguage === 'English' || savedLanguage === 'Italiano') return savedLanguage
-    return navigator.language.toLowerCase().startsWith('it') ? 'Italiano' : 'English'
-  })
   const [dark, setDark] = useState(() => localStorage.getItem('codepatch-theme') !== 'light')
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const t = copy[language]
+  const t = copy.English
 
   useEffect(() => { document.documentElement.dataset.theme = dark ? 'dark' : 'light'; localStorage.setItem('codepatch-theme', dark ? 'dark' : 'light') }, [dark])
-  useEffect(() => { localStorage.setItem('codepatch-language', language) }, [language])
   useEffect(() => {
     const updateScrollState = () => setScrolled(window.scrollY > 24)
     updateScrollState()
@@ -63,6 +65,14 @@ function App() {
     return () => window.removeEventListener('scroll', updateScrollState)
   }, [])
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMenuOpen(false) }, [page])
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll('main section'))
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      entry.target.classList.toggle('is-visible', entry.isIntersecting)
+    }), { threshold: 0.12, rootMargin: '0px 0px -8% 0px' })
+    sections.forEach(section => observer.observe(section))
+    return () => observer.disconnect()
+  }, [page])
 
   const navigate = (next: Page) => setPage(next)
 
@@ -76,9 +86,9 @@ function App() {
         <NavItem active={page === 'about'} label={t.about} onClick={() => navigate('about')} />
         <NavItem active={page === 'path'} label={t.path} onClick={() => navigate('path')} />
       </div>
-      <div className="nav-actions"><label className="language"><Globe2 size={14} /><span>{language}</span><select value={language} onChange={e => setLanguage(e.target.value as Language)} aria-label="Language"><option>English</option><option>Italiano</option></select><ChevronDown size={13} /></label><button className="icon-button" onClick={() => setDark(!dark)} aria-label="Toggle theme">{dark ? <Sun size={16} /> : <Moon size={16} />}</button><button className="icon-button menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open menu">{menuOpen ? <X size={18} /> : <Menu size={18} />}</button></div>
+      <div className="nav-actions"><button className="icon-button" onClick={() => setDark(!dark)} aria-label="Toggle theme">{dark ? <Sun size={16} /> : <Moon size={16} />}</button><button className="icon-button menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open menu">{menuOpen ? <X size={18} /> : <Menu size={18} />}</button></div>
     </nav></header>
-    <main className="page-transition" key={page}>{page === 'home' && <Home t={t} navigate={navigate} />}{page === 'projects' && <Projects t={t} category={category} setCategory={setCategory} navigate={navigate} />}{page === 'about' && <About t={t} />}{page === 'path' && <Path t={t} />}</main>
+    <main className={`page-transition ${page}-motion`} key={page}>{page === 'home' && <Home t={t} navigate={navigate} />}{page === 'projects' && <Projects t={t} category={category} setCategory={setCategory} navigate={navigate} />}{page === 'about' && <About t={t} />}{page === 'path' && <Path t={t} />}</main>
     <Footer navigate={navigate} t={t} />
   </div>
 }
@@ -87,27 +97,49 @@ function NavItem({ active, label, onClick }: { active: boolean; label: string; o
 function Button({ children, onClick, secondary = false }: { children: React.ReactNode; onClick?: () => void; secondary?: boolean }) { return <button onClick={onClick} className={`button ${secondary ? 'secondary' : ''}`}>{children}<ArrowUpRight size={16} /></button> }
 function SectionLabel({ children }: { children: React.ReactNode }) { return <div className="section-label"><span />{children}</div> }
 
+function ContactSection({ t }: { t: typeof copy.English }) {
+  const [sent, setSent] = useState(false)
+  const [reason, setReason] = useState('Freelance / Collaboration')
+  const [reasonOpen, setReasonOpen] = useState(false)
+  const reasons = ['Freelance / Collaboration', 'Project idea', 'Tech discussion', 'Just saying hi']
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const subject = encodeURIComponent(`${reason} - CodePatch`)
+    const body = encodeURIComponent(`From: ${form.get('email')}\n\n${form.get('message')}`)
+    window.location.href = `mailto:codepatch833@gmail.com?subject=${subject}&body=${body}`
+    setSent(true)
+  }
+  return <section className="contact-section content-grid"><div className="contact-copy"><SectionLabel>{t.contact}</SectionLabel><h2>Let's build<br /><em>something.</em></h2><p>Available for collaborations, project ideas, technical conversations, or just saying hi.</p><div className="availability"><i className="status-dot" />Available for collaborations</div></div><form className="contact-form" onSubmit={submit}><label>Reason<div className={`reason-picker ${reasonOpen ? 'is-open' : ''}`}><button type="button" className="reason-trigger" onClick={() => setReasonOpen(!reasonOpen)} aria-haspopup="listbox" aria-expanded={reasonOpen}>{reason}<ChevronDown size={15} /></button>{reasonOpen && <div className="reason-options" role="listbox">{reasons.map(option => <button type="button" role="option" aria-selected={reason === option} className={reason === option ? 'selected' : ''} key={option} onClick={() => { setReason(option); setReasonOpen(false) }}>{option}<span>{reason === option ? '✓' : ''}</span></button>)}</div>}</div></label><label>Email<input name="email" type="email" required placeholder="you@example.com" /></label><label>Message<textarea name="message" required rows={5} placeholder="Tell me what you are building..." /></label><button className="button" type="submit">{sent ? 'Message received.' : 'Send message'}<ArrowUpRight size={16} /></button></form></section>
+}
+
+function HowIBuild({ t }: { t: typeof copy.English }) { const steps = t.home === 'Home' ? [['01', 'Frame the problem', 'I start with the user, the constraint and the smallest useful version.'], ['02', 'Choose with intent', 'I pick tools for the job: fast experiments when speed matters, durable systems when they need to last.'], ['03', 'Debug in the open', 'I reproduce the issue, reduce it to a clear signal and fix the cause, not the symptom.'], ['04', 'Ship and repeat', 'A product becomes real through feedback, iteration and the courage to improve it.']] : [['01', 'Definisco il problema', 'Parto dall’utente, dal vincolo e dalla versione utile più piccola.'], ['02', 'Scelgo con intenzione', 'Scelgo gli strumenti in base al lavoro: esperimenti veloci o sistemi pronti a durare.'], ['03', 'Faccio debugging', 'Riproduco il problema, lo riduco a un segnale chiaro e correggo la causa.'], ['04', 'Pubblico e ripeto', 'Un prodotto diventa reale grazie a feedback, iterazione e voglia di migliorare.']]; return <section className="build-section"><div className="content-grid"><SectionLabel>{t.home === 'Home' ? 'HOW I BUILD' : 'COME SVILUPPO'}</SectionLabel><h2>{t.home === 'Home' ? <>Build.<br /><em>Explore. Repeat.</em></> : <>Costruisco.<br /><em>Esploro. Ripeto.</em></>}</h2><div className="build-grid">{steps.map(([number, title, text]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div></div></section> }
+
+function BehindPathToFact({ t, lastSynced }: { t: typeof copy.English; lastSynced: number | null }) { return <section className="behind-section content-grid"><div><SectionLabel>{t.home === 'Home' ? 'BEHIND PATHTOFACT' : 'DIETRO PATHTOFACT'}</SectionLabel><h2>{t.home === 'Home' ? <>Curiosity,<br /><em>built to move.</em></> : <>La curiosità,<br /><em>costruita per muoversi.</em></>}</h2></div><div className="behind-copy"><p>{t.home === 'Home' ? 'Path to Fact is the explore side of the same idea. I built the data layer, API integrations and live video surface so curiosity can become something you can follow, watch and revisit.' : 'Path to Fact è il lato esplorativo della stessa idea. Ho sviluppato il livello dati, le integrazioni API e la superficie live per trasformare la curiosità in qualcosa da seguire e riguardare.'}</p><div className="sync-status"><i className="status-dot" /><span>Last synced</span><strong>{lastSynced ? new Date(lastSynced).toLocaleString() : 'Waiting for live data'}</strong></div><small>Built by CodePatch</small></div></section> }
+
 function Home({ t, navigate }: { t: typeof copy.English; navigate: (p: Page) => void }) { return <>
-  <section className="hero content-grid"><div className="hero-copy reveal"><SectionLabel>{t.eyebrow}</SectionLabel><h1>{t.title.split('\n').map((line, i) => <span key={line} className={i === 1 ? 'gradient-text' : ''}>{line}</span>)}</h1><p className="hero-intro">{t.intro}</p><div className="hero-buttons"><Button onClick={() => navigate('projects')}>{t.viewAll}</Button><Button secondary onClick={() => navigate('about')}>{t.about}</Button></div><div className="hero-meta"><span><i className="status-dot" />{t.available}</span><span>{t.based}</span></div></div><HeroVisual /></section>
-  <section className="section content-grid projects-preview"><div className="section-heading"><div><SectionLabel>01 / {t.work}</SectionLabel><h2>{t.selected}</h2></div><button className="text-link" onClick={() => navigate('projects')}>{t.viewAll} <ArrowUpRight size={16} /></button></div><div className="project-grid">{projects.slice(0, 3).map(project => <ProjectCard key={project.title + project.icon} project={project} language={t.home === 'Home' ? 'English' : 'Italiano'} />)}</div></section>
+  <section className="hero content-grid"><div className="hero-copy reveal"><SectionLabel>{t.eyebrow}</SectionLabel><h1>{t.title.split('\n').map((line, i) => <span key={line} className={i === 1 ? 'gradient-text' : ''}>{line}</span>)}</h1><p className="hero-intro">{t.intro}</p><div className="hero-buttons"><Button onClick={() => navigate('projects')}>{t.viewAll}</Button><Button secondary onClick={() => navigate('about')}>{t.about}</Button></div><div className="hero-meta"><span><i className="status-dot" />{t.available}</span><span>{t.based}</span></div></div><HeroVisual italian={t.home !== 'Home'} /></section>
+  <section className="ecosystem-section content-grid"><SectionLabel>{t.home === 'Home' ? 'BUILD / EXPLORE / REPEAT' : 'COSTRUIRE / ESPLORARE / RIPETERE'}</SectionLabel><h2>{t.home === 'Home' ? <>I build things<br /><em>I’m curious about.</em></> : <>Costruisco ciò che<br /><em>mi incuriosisce.</em></>}</h2><div className="ecosystem-grid"><div><strong>CodePatch</strong><span>{t.home === 'Home' ? 'Build / Create / Developer' : 'Costruire / Creare / Sviluppatore'}</span></div><div className="ecosystem-link">↔</div><div><strong>PathToFact</strong><span>{t.home === 'Home' ? 'Explore / Learn / Curiosity' : 'Esplorare / Imparare / Curiosità'}</span></div></div><p className="ecosystem-note">{t.home === 'Home' ? 'Two sides of the same medal, connected by one thread: me.' : 'Due facce della stessa medaglia, unite da un filo conduttore: io.'}</p></section>
+  <section className="section content-grid projects-preview"><div className="section-heading"><div><SectionLabel>01 / {t.work}</SectionLabel><h2>{t.selected}</h2></div><button className="text-link" onClick={() => navigate('projects')}>{t.viewAll} <ArrowUpRight size={16} /></button></div><div className="project-grid">{recentProjects.map(project => <ProjectCard key={project.title + project.icon} project={project} language="English" />)}</div></section>
   <section className="statement"><div className="content-grid statement-inner"><SectionLabel>02 / {t.approach}</SectionLabel><h2>{languageLine(t, 'Make it useful.', 'Rendilo utile.')}<br /><em>{languageLine(t, 'Make it memorable.', 'Rendilo memorabile.')}</em></h2><p>{t.approachText}</p></div></section>
   <section className="path-teaser content-grid"><div><SectionLabel>03 / {t.sideProject}</SectionLabel><h2>{t.home === 'Home' ? <>Curiosity takes<br /><span>you somewhere.</span></> : <>La curiosità ti porta<br /><span>da qualche parte.</span></>}</h2><p>{t.pathIntro}</p><Button secondary onClick={() => navigate('path')}>{t.explore}</Button></div><div className="path-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><img className="orbit-logo" src={pathToFactLogo} alt="Path to Fact" /><span className="orbit-note note-one">{t.home === 'Home' ? 'facts' : 'fatti'}</span><span className="orbit-note note-two">{t.home === 'Home' ? 'stories' : 'storie'}</span></div></section>
+  <BehindPathToFact t={t} lastSynced={readCache<YoutubeCache>('codepatch-youtube-data')?.savedAt ?? null} />
+  <ContactSection t={t} />
 </> }
 
 function languageLine(t: typeof copy.English, english: string, italian: string) { return t.home === 'Home' ? english : italian }
 
-function HeroVisual() { return <div className="hero-visual" aria-label="Abstract CodePatch visual"><div className="visual-grid" /><div className="visual-glow" /><div className="code-window"><div className="window-bar"><span /><span /><span /><small>codepatch.ts</small></div><div className="code-lines"><p><b>const</b> future <i>=</i> <strong>{'{'}</strong></p><p className="indent">build: <mark>"with intent"</mark>,</p><p className="indent">ship: <mark>true</mark>,</p><p><strong>{'}'}</strong></p></div></div><div className="float-chip chip-one"><Code2 size={15} /> creative systems</div><div className="float-chip chip-two">01<span>/04</span></div><div className="visual-caption">IDEAS → <b>REALITY</b></div></div> }
+function HeroVisual({ italian = false }: { italian?: boolean }) { return <div className="hero-visual" aria-label="Abstract CodePatch visual"><div className="visual-grid" /><div className="visual-glow" /><div className="code-window"><div className="window-bar"><span /><span /><span /><small>codepatch.ts</small></div><div className="code-lines"><p><b>const</b> future <i>=</i> <strong>{'{'}</strong></p><p className="indent">build: <mark>"with intent"</mark>,</p><p className="indent">ship: <mark>true</mark>,</p><p><strong>{'}'}</strong></p></div></div><div className="float-chip chip-one"><Code2 size={15} /> {italian ? 'sistemi creativi' : 'creative systems'}</div><div className="float-chip chip-two">01<span>/04</span></div><div className="visual-caption">{italian ? 'IDEE' : 'IDEAS'} → <b>{italian ? 'REALTÀ' : 'REALITY'}</b></div></div> }
 
-function ProjectCard({ project, language = 'English' }: { project: typeof projects[number]; language?: Language }) { const categoryLabel = language === 'Italiano' ? ({ Games: 'GIOCHI', Software: 'SOFTWARE', Experiments: 'ESPERIMENTI', Tools: 'STRUMENTI' }[project.category] ?? project.category).toUpperCase() : project.category.toUpperCase(); return <a className={`project-card ${project.tone}`} href={project.link} target="_blank" rel="noreferrer"><div className="project-art"><span className="art-index">{project.icon} / {categoryLabel}</span><div className="art-shape" /><span className="art-year">{project.year}</span><ArrowUpRight className="art-arrow" size={20} /></div><div className="project-info"><div><h3>{project.title}</h3><p>{projectDescription(project, language)}</p></div><div className="tags">{project.tags.map(tag => <span key={tag}>{tag}</span>)}</div></div></a> }
+function ProjectCard({ project, language = 'English' }: { project: typeof projects[number]; language?: Language }) { const categoryLabel = language === 'Italiano' ? ({ Games: 'GIOCHI', Software: 'SOFTWARE', Experiments: 'ESPERIMENTI', Tools: 'STRUMENTI' }[project.category] ?? project.category).toUpperCase() : project.category.toUpperCase(); return <a className={`project-card ${project.tone}`} href={project.link} target="_blank" rel="noreferrer"><div className="project-art"><img className="project-art-image" src={project.image} alt="" /><span className="art-index">{project.icon} / {categoryLabel}</span><ArrowUpRight className="art-arrow" size={20} /></div><div className="project-info"><div><h3>{project.title}</h3><p>{projectDescription(project, language)}</p></div><div className="tags">{project.tags.map(tag => <span key={tag}>{tag}</span>)}</div></div></a> }
 
-function ItchCard({ project, language }: { project: ItchProject; language: Language }) { return <a className="itch-card" href={project.url} target="_blank" rel="noreferrer"><div className="itch-cover" style={{ backgroundImage: `url(${project.coverUrl})` }}><span>itch.io</span><ArrowUpRight size={20} /></div><div className="itch-info"><div><h3>{project.title}</h3><p>{project.description}</p></div><div className="itch-meta"><span>{project.engine}</span><span>{project.price === '0' ? (language === 'Italiano' ? 'Gratis' : 'Free') : project.price}</span><span>{project.publishedAt}</span></div></div></a> }
+function ItchCard({ project }: { project: ItchProject }) { return <a className="itch-card" href={project.url} target="_blank" rel="noreferrer"><div className={`itch-cover ${project.coverUrl ? 'has-cover' : 'is-fallback'}`}>{project.coverUrl && <img className="itch-cover-image" src={project.coverUrl} alt="" />}<span>GAME / itch.io</span><ArrowUpRight size={20} /></div><div className="itch-info"><div><h3>{project.title}</h3><p>{project.description}</p></div><div className="game-engine"><span>GAME</span><strong>{project.engine}</strong></div></div></a> }
 
 function projectDescription(project: typeof projects[number], language: Language) { if (language === 'English') return project.description; const descriptions: Record<string, string> = { 'Layer 0: Find the Impostor': 'Un gioco investigativo nel cyberspazio dell’ONU: completa i compiti, osserva e vota in tre round.', 'Formula X - F1 Manager': 'Un gioco manageriale di Formula 1 che porta la serie nel futuro.', "WarEve - Domains' Return": 'Un gioco che permette di tornare indietro nella storia, tra guerra e simulazione.', 'Lumber Jack': 'Diventa un taglialegna veloce in questa simulazione arcade.', 'F1 Manager S2': 'Il secondo capitolo della serie F1 Manager.', 'F1 Manager Classic': 'Il primo capitolo della serie F1 Manager.' }; return descriptions[project.title] ?? project.description }
 
 function Projects({ t, category, setCategory, navigate: _navigate }: { t: typeof copy.English; category: Category; setCategory: (c: Category) => void; navigate: (p: Page) => void }) {
   const [itchProjects, setItchProjects] = useState<ItchProject[]>([])
   const categories: Category[] = ['All', 'Games', 'Software', 'Experiments', 'Tools']
-  const shown = category === 'All' ? projects : projects.filter(p => p.category === category)
   const labels = t.home === 'Home' ? categories : ['Tutti', 'Giochi', 'Software', 'Esperimenti', 'Strumenti']
 
   useEffect(() => {
@@ -120,28 +152,33 @@ function Projects({ t, category, setCategory, navigate: _navigate }: { t: typeof
       .then(response => response.ok ? response.json() : Promise.reject(new Error('itch.io request failed')))
       .then(data => (data.games ?? []).map((game: { id: number; title: string; url: string; cover_url?: string; price?: number; published_at?: string; short_text?: string }) => {
         const slug = game.url.split('/').pop() ?? ''
-        return { id: String(game.id), title: game.title, url: game.url, coverUrl: game.cover_url ?? '', price: game.price ? `$${game.price}` : '0', publishedAt: game.published_at ? new Date(game.published_at).toLocaleDateString() : '', engine: itchEngineBySlug[slug] ?? 'Game engine', description: game.short_text ?? '' }
+        return { id: String(game.id), title: game.title, url: game.url, coverUrl: game.cover_url ?? '', price: game.price ? `$${game.price}` : '0', publishedAt: game.published_at ? new Date(game.published_at).toLocaleDateString() : '', engine: itchEngineBySlug[slug] ?? (t.home === 'Home' ? 'Game engine' : 'Motore di gioco'), description: game.short_text ?? '' }
       }))
       .then(nextProjects => { setItchProjects(nextProjects); writeCache('codepatch-itch-projects', nextProjects) })
       .catch(() => { if (!cached) setItchProjects([]) })
   }, [])
 
-  return <section className="page-section content-grid"><div className="page-intro"><SectionLabel>01 / {t.selectedWork}</SectionLabel><h1>{t.home === 'Home' ? 'Projects that' : 'Progetti che'}<br /><span className="gradient-text">{t.home === 'Home' ? 'move ideas forward.' : 'portano avanti le idee.'}</span></h1><p>{t.projectsIntro}</p></div><div className="filters">{categories.map((item, index) => <button className={category === item ? 'selected' : ''} onClick={() => setCategory(item)} key={item}>{labels[index]}</button>)}</div><div className="project-grid projects-page-grid">{shown.map(project => <ProjectCard key={project.icon} project={project} language={t.home === 'Home' ? 'English' : 'Italiano'} />)}</div><div className="itch-section"><div className="section-heading"><div><SectionLabel>ITCH.IO / {t.home === 'Home' ? 'PUBLISHED GAMES' : 'GIOCHI PUBBLICATI'}</SectionLabel><h2>{t.home === 'Home' ? 'Made to be played.' : 'Creati per essere giocati.'}</h2></div></div><div className="itch-grid">{(itchProjects.length ? itchProjects : projects.map(project => ({ id: project.icon, title: project.title, url: project.link, coverUrl: '', price: '0', publishedAt: project.year, engine: project.tags[0], description: project.description }))).map(project => <ItchCard key={project.id} project={project} language={t.home === 'Home' ? 'English' : 'Italiano'} />)}</div></div></section>
+  const fallbackProjects = projects.map(project => ({ id: project.icon, title: project.title, url: project.link, coverUrl: project.image, price: '0', publishedAt: project.year, engine: project.title.startsWith('Layer 0') ? 'Unity' : 'Scratch', description: project.description }))
+  const gameProjects = itchProjects.length ? itchProjects : fallbackProjects
+  const visibleGames = category === 'All' || category === 'Games' ? gameProjects : []
+  return <section className="page-section content-grid"><div className="page-intro"><SectionLabel>01 / {t.selectedWork}</SectionLabel><h1>Projects that<br /><span className="gradient-text">move ideas forward.</span></h1><p>{t.projectsIntro}</p></div><div className="filters">{categories.map((item, index) => <button className={category === item ? 'selected' : ''} onClick={() => setCategory(item)} key={item}>{labels[index]}</button>)}</div><div className="itch-grid projects-games-grid">{visibleGames.map(project => <ItchCard key={project.id} project={project} />)}</div></section>
 }
 
-function About({ t }: { t: typeof copy.English }) { return <section className="page-section content-grid about-page"><div className="page-intro"><SectionLabel>02 / {t.person}</SectionLabel><h1>{t.aboutTitle.split('\n').map(line => <span key={line}>{line}</span>)}</h1><p>{t.intro} {t.home === 'Home' ? 'I’m Italian, a student and a tennis player who started creating with Scratch before moving into Unity and game development. I build games for fun, keep learning development languages and value honest feedback.' : 'Sono italiano, studente e tennista. Ho iniziato a creare con Scratch prima di passare a Unity e allo sviluppo di giochi. Creo per divertirmi, continuo a studiare linguaggi di programmazione e considero importante il feedback sincero.'}</p></div><div className="about-layout"><div className="about-note"><span className="quote-mark">“</span><p>{t.home === 'Home' ? 'From Scratch experiments to Unity games, every project is a way to keep learning.' : 'Dagli esperimenti con Scratch ai giochi in Unity, ogni progetto è un modo per continuare a imparare.'}</p><span className="note-signature">— CodePatch</span><div className="profile-links"><a href="https://codepatch.itch.io/" target="_blank" rel="noreferrer">itch.io <ExternalLink size={13} /></a><a href="https://scratch.mit.edu/users/codepatch/" target="_blank" rel="noreferrer">Scratch <ExternalLink size={13} /></a><a href="https://www.youtube.com/channel/UCLNG7PfbdAo5WHB16BPYN1A" target="_blank" rel="noreferrer">YouTube <ExternalLink size={13} /></a></div></div><div className="toolbox"><SectionLabel>{t.toolbox}</SectionLabel><div className="tool-list">{['Scratch', 'Unity', 'C#', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'Git'].map((tool, i) => <div key={tool}><span>0{i + 1}</span>{tool}<ArrowUpRight size={14} /></div>)}</div><div className="contact-list"><small>{t.contact}</small><a href="mailto:codepatch833@gmail.com">codepatch833@gmail.com</a><a href="mailto:pathtofact.info@gmail.com">pathtofact.info@gmail.com</a></div></div></div></section> }
+function About({ t }: { t: typeof copy.English }) { return <><section className="page-section content-grid about-page"><div className="page-intro"><SectionLabel>02 / {t.person}</SectionLabel><h1>{t.aboutTitle.split('\n').map(line => <span key={line}>{line}</span>)}</h1><p>{t.intro} {t.home === 'Home' ? 'I’m Italian, a student and a tennis player who started creating with Scratch before moving into Unity and game development. I build games for fun, keep learning development languages and value honest feedback.' : 'Sono italiano, studente e tennista. Ho iniziato a creare con Scratch prima di passare a Unity e allo sviluppo di giochi. Creo per divertirmi, continuo a studiare linguaggi di programmazione e considero importante il feedback sincero.'}</p></div><div className="about-layout"><div className="about-note"><span className="quote-mark">“</span><p>{t.home === 'Home' ? 'From Scratch experiments to Unity games, every project is a way to keep learning.' : 'Dagli esperimenti con Scratch ai giochi in Unity, ogni progetto è un modo per continuare a imparare.'}</p><span className="note-signature">— CodePatch</span><div className="profile-links"><a href="https://codepatch.itch.io/" target="_blank" rel="noreferrer">itch.io <ExternalLink size={13} /></a><a href="https://scratch.mit.edu/users/codepatch/" target="_blank" rel="noreferrer">Scratch <ExternalLink size={13} /></a><a href="https://www.youtube.com/channel/UCLNG7PfbdAo5WHB16BPYN1A" target="_blank" rel="noreferrer">YouTube <ExternalLink size={13} /></a></div></div><div className="toolbox"><SectionLabel>{t.toolbox}</SectionLabel><div className="tool-list">{['Scratch', 'Unity', 'C#', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'Git'].map((tool, i) => <div key={tool}><span>0{i + 1}</span>{tool}<ArrowUpRight size={14} /></div>)}</div><div className="contact-list"><small>{t.contact}</small><a href="mailto:codepatch833@gmail.com">codepatch833@gmail.com</a><a href="mailto:pathtofact.info@gmail.com">pathtofact.info@gmail.com</a></div></div></div></section><HowIBuild t={t} /><ContactSection t={t} /></> }
 
 function Path({ t }: { t: typeof copy.English }) {
   const [videos, setVideos] = useState<VideoItem[]>([])
   const [latestVideo, setLatestVideo] = useState<VideoItem | null>(null)
   const [channelStats, setChannelStats] = useState<ChannelStats | null>(null)
   const [videoStats, setVideoStats] = useState<VideoStats[]>([])
+  const [lastSynced, setLastSynced] = useState<number | null>(null)
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY
     if (!apiKey) return
     const cached = readCache<YoutubeCache>('codepatch-youtube-data')
     if (cached) {
+      setLastSynced(cached.savedAt)
       setVideos(cached.data.videos)
       setLatestVideo(cached.data.latestVideo)
       setChannelStats(cached.data.channelStats)
@@ -170,6 +207,7 @@ function Path({ t }: { t: typeof copy.English }) {
         return request(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${nextVideos.map((video: VideoItem) => video.id).join(',')}&key=${apiKey}`)
       })
       .then(data => {
+        setLastSynced(Date.now())
         const nextVideoStats = (data.items ?? []).map((item: { statistics: { viewCount?: string; likeCount?: string } }) => ({ views: item.statistics.viewCount ?? '0', likes: item.statistics.likeCount ?? '0' }))
         setVideoStats(nextVideoStats)
         const nextData = { videos: fetchedVideos, latestVideo: fetchedLatestVideo, channelStats: fetchedChannelStats, videoStats: nextVideoStats }
@@ -184,7 +222,7 @@ function Path({ t }: { t: typeof copy.English }) {
 }
 
 function formatCount(value: string) { const number = Number(value); return Number.isFinite(number) ? new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(number) : value }
-function Stat({ value, label }: { value: string; label: string }) { return <div className="stat-card"><strong>{value}</strong><span>{label}</span></div> }
+function Stat({ value, label }: { value: string; label: string }) { const syncedAt = readCache<YoutubeCache>('codepatch-youtube-data')?.savedAt; const italian = label === 'Iscritti'; const isFirstStat = label === 'Subscribers' || italian; return <div className="stat-card"><strong>{value}</strong><span>{label}</span>{isFirstStat && <small className="stat-sync">{italian ? 'Ultimo aggiornamento' : 'Last synced'}: {syncedAt ? new Date(syncedAt).toLocaleString() : (italian ? 'in attesa dei dati live' : 'waiting for live data')}</small>}</div> }
 
 function Footer({ navigate, t }: { navigate: (p: Page) => void; t: typeof copy.English }) { return <footer><div className="content-grid footer-grid"><div><button className="brand footer-brand" onClick={() => navigate('home')}><span className="brand-logo-frame"><img src={codepatchLogo} alt="CodePatch" /></span><span className="brand-name">CodePatch</span></button><p>{t.tagline}</p></div><div className="footer-links"><div><small>{t.exploreLabel}</small><button onClick={() => navigate('home')}>{t.home}</button><button onClick={() => navigate('projects')}>{t.projects}</button><button onClick={() => navigate('about')}>{t.about}</button><button onClick={() => navigate('path')}>{t.path}</button></div><div><small>{t.connect}</small><a href="https://codepatch.itch.io/" target="_blank" rel="noreferrer">itch.io <ExternalLink size={13} /></a><a href="https://www.youtube.com/channel/UCLNG7PfbdAo5WHB16BPYN1A" target="_blank" rel="noreferrer">YouTube <ExternalLink size={13} /></a><a href="mailto:codepatch833@gmail.com">Email <ExternalLink size={13} /></a></div></div></div><div className="content-grid footer-bottom"><span>© 2026 CodePatch</span><span>{t.home === 'Home' ? 'Made with intent' : 'Creato con intenzione'} <GitBranch size={14} /></span></div></footer> }
 
